@@ -17,7 +17,7 @@ class SmartParking extends StatelessWidget {
   }
 }
 
-// --- LOGIN SCREEN ---
+// 1. LOGIN SCREEN
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// --- MAIN UI SCREEN ---
+// 2. MAIN UI SCREEN
 class MainUI extends StatelessWidget {
   const MainUI({super.key});
 
@@ -143,15 +143,21 @@ class MainUI extends StatelessWidget {
             color: Colors.grey[200],
             child: const Center(child: Text("Parking Image Placeholder")),
           ),
-          _menuButton(context, "View Booking", const Color(0xFFBDE0FE), () {}),
-          _menuButton(
-            context,
-            "Car Park in NSBM",
-            const Color(0xFFBDE0FE),
-            () {},
-          ),
+
+          _menuButton(context, "View Booking", const Color(0xFFBDE0FE), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BookingScreen()),
+            );
+          }),
+
+          _menuButton(context, "Car Park in NSBM", const Color(0xFFBDE0FE), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CarParkScreen()),
+            );
+          }),
           _menuButton(context, "Live Location", const Color(0xFFBDE0FE), () {}),
-          // REDIRECTS TO MY PARKING
           _menuButton(context, "My Parking", const Color(0xFF98FFFF), () {
             Navigator.push(
               context,
@@ -197,9 +203,102 @@ class MainUI extends StatelessWidget {
   }
 }
 
-// --- MY PARKING SCREEN ---
-class MyParkingScreen extends StatelessWidget {
-  const MyParkingScreen({super.key});
+// 3. VIEW BOOKING SCREEN
+class BookingScreen extends StatelessWidget {
+  const BookingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> slots = [
+      "A1",
+      "A2",
+      "B1",
+      "B2",
+      "C1",
+      "C2",
+      "D1",
+      "D2",
+      "E1",
+      "E2",
+    ];
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black, size: 30),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 350,
+              width: double.infinity,
+              color: Colors.grey[400],
+              child: const Center(child: Text("Aerial View Image")),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Active Booking",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    "Slots",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 15),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: slots
+                        .map(
+                          (slot) => Container(
+                            width: 50,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              color: slot == "A2"
+                                  ? Colors.blue
+                                  : const Color(0xFFE3F2FD),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                slot,
+                                style: TextStyle(
+                                  color: slot == "A2"
+                                      ? Colors.white
+                                      : Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 4.CAR PARK IN NSBM SCREEN
+class CarParkScreen extends StatelessWidget {
+  const CarParkScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -209,161 +308,176 @@ class MyParkingScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: const Text(
-            "My Parking",
-            style: TextStyle(color: Colors.black, fontSize: 24),
-          ),
+        title: const Text(
+          "Car Park in NSBM",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
+      body: SingleChildScrollView(
+        child: Column(
           children: [
-            _reportCard("Weekly Report"),
-            _reportCard("Monthly Report"),
-            _reportCard("Incident Report"),
-            _reportCard("Recieved Complaints"),
+            Container(
+              height: 350,
+              width: double.infinity,
+              color: Colors.grey[200],
+              child: const Center(child: Text("Map View")),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  _buildInput("Select the Slot"),
+                  _buildInput("Time"),
+                  _buildInput("Car Number"),
+                  _buildInput("Total Amount"),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF91C4F2),
+                      minimumSize: const Size(200, 50),
+                    ),
+                    child: const Text(
+                      "Pay",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _reportCard(String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFEDF4FF),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: Icon(
-              Icons.image_outlined,
-              size: 50,
-              color: Colors.blue.shade200,
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-            ),
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
+  Widget _buildInput(String hint) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.grey[300],
+          border: InputBorder.none,
+        ),
       ),
     );
   }
 }
 
-// --- PROFILE SCREEN ---
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+// 5.MY PARKING SCREEN
+class MyParkingScreen extends StatelessWidget {
+  const MyParkingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Profile",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: const Text("My Parking"),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                child: Icon(Icons.person, size: 50),
-              ),
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Lucas Scott",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            _settingTile(context, "Mobile number"),
-            _settingTile(context, "NIC"),
-            _settingTile(context, "Student ID"),
-            _settingTile(context, "Personal Vehicle Number"),
-            _settingTile(context, "Payment Methods"),
-            // UPDATED: Profile "My Parking" now points to the same screen
-            _settingTile(
-              context,
-              "My Parking",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyParkingScreen(),
+      body: GridView.count(
+        padding: const EdgeInsets.all(20),
+        crossAxisCount: 2,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
+        children:
+            [
+                  "Weekly Report",
+                  "Monthly Report",
+                  "Incident Report",
+                  "Recieved Complaints",
+                ]
+                .map(
+                  (title) => Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEDF4FF),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        const Expanded(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 50,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          color: Colors.white,
+                          child: Text(
+                            title,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
-            ),
-            _settingTile(context, "Privacy & Security"),
-            _settingTile(context, "Logout", isLast: true, isLogout: true),
-          ],
-        ),
+                )
+                .toList(),
+      ),
+    );
+  }
+}
+
+// 6.PROFILE SCREEN
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Profile"), centerTitle: true),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
+          const SizedBox(height: 15),
+          const Text(
+            "Ravishan Kavishka",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 30),
+          _tile(context, "Mobile number", () {}),
+          _tile(context, "NIC", () {}),
+          _tile(context, "Student ID", () {}),
+          _tile(context, "My Parking", () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MyParkingScreen()),
+            );
+          }),
+          _tile(context, "Logout", () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+              (route) => false,
+            );
+          }),
+        ],
       ),
     );
   }
 
-  Widget _settingTile(
-    BuildContext context,
-    String title, {
-    bool isLast = false,
-    bool isLogout = false,
-    VoidCallback? onTap,
-  }) {
-    return Column(
-      children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 25),
-          title: Text(title, style: const TextStyle(fontSize: 16)),
-          trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-          onTap:
-              onTap ??
-              () {
-                if (isLogout) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                    (route) => false,
-                  );
-                }
-              },
-        ),
-        if (!isLast) const Divider(height: 1, indent: 25, endIndent: 25),
-      ],
+  Widget _tile(BuildContext context, String title, VoidCallback onTap) {
+    return ListTile(
+      title: Text(title),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 }
