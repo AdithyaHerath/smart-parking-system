@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🚗 Smart Parking System
 
 Complete smart parking management system with automatic license plate recognition, Flask backend API, and SQLite database.
@@ -262,3 +263,7 @@ This project is for educational purposes.
 ---
 
 **Made with ❤️ for Smart Parking Management**
+=======
+# smart-parking-system
+Smart Parking Management System 🚗📡 is an IoT-based solution that automates vehicle entry, parking allocation, and monitoring using ANPR, ESP32 devices, and a cloud-connected application ☁️. It provides real-time slot availability 🅿️, secure access control 🔐, and digital payments 💳 to reduce congestion and improve campus parking efficiency.
+>>>>>>> de49d4ce5993fcf4e9dc560d9a152d6b5bc3c126
