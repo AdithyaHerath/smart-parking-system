@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Parking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--glass);
+            border: 1px solid var(--glass);
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .toggle-btn {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .toggle-btn span {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #f87171;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card" id="loginForm">
+        <h2>SMART PARK</h2>
+        <div id="errorMessage" class="error">Invalid credentials</div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+        </div>
+
+        <div class="form-group" id="fullNameGroup" style="display:none">
+            <label>Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group" id="emailGroup" style="display:none">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <button id="submitBtn">Login</button>
+
+        <div class="toggle-btn">
+            <span id="toggleMode">Need an account? Register</span>
+        </div>
+    </div>
+
+    <script>
+        const CLOUD_BACKEND_URL = "https://your-backend-url.onrender.com"; // REPLACE AFTER DEPLOYMENT
+        const isLocal = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '' ||
+            window.location.hostname.startsWith('192.168.');
+
+        const API_URL = isLocal
+            ? "http://localhost:5001/api/auth"
+            : `${CLOUD_BACKEND_URL}/api/auth`;
+        let isLogin = true;
+
+        document.getElementById('toggleMode').onclick = () => {
+            isLogin = !isLogin;
+            document.getElementById('fullNameGroup').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('emailGroup').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('submitBtn').innerText = isLogin ? 'Login' : 'Register';
+            document.getElementById('toggleMode').innerText = isLogin ? 'Need an account? Register' : 'Have an account? Login';
+            document.querySelector('h2').innerText = isLogin ? 'SMART PARK' : 'REGISTER';
+        };
+
+        const handleSubmit = async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const errorEl = document.getElementById('errorMessage');
+
+            // Basic validation
+            if (!username || !password) {
+                errorEl.innerText = "Please fill all fields";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const endpoint = isLogin ? '/login' : '/register';
+            let body = {};
+
+            if (isLogin) {
+                body = { username, password };
+            } else {
+                // Register fields
+                if (!fullName || !email) {
+                    errorEl.innerText = "Please fill all registration fields";
+                    errorEl.style.display = 'block';
+                    return;
+                }
+                body = { username, password, full_name: fullName, email };
+            }
+
+            try {
+                // Show loading state
+                const btn = document.getElementById('submitBtn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Processing...';
+                btn.disabled = true;
+
+                // Adjust API URL logic if needed, ensuring correct endpoint construction
+                const fullUrl = API_URL.endsWith('/auth')
+                    ? `${API_URL}${endpoint}`
+                    : `${API_URL}/auth${endpoint}`;
+
+                const res = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+
+                if (data.status === 'success') {
+                    if (isLogin) {
+                        localStorage.setItem('user', JSON.stringify(data.user || data.data)); // Handle different potential responses
+                        const role = (data.user && data.user.role) || (data.data && data.data.role);
+
+                        if (role === 'admin') window.location.href = 'admin_dashboard.html';
+                        else window.location.href = 'user_dashboard.html';
+                    } else {
+                        alert('Registration successful! Please login.');
+                        // Switch to login view
+                        if (!isLogin) document.getElementById('toggleMode').click();
+                    }
+                } else {
+                    errorEl.innerText = data.message || "Login failed";
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('submitBtn').innerText = isLogin ? 'Login' : 'Register';
+                document.getElementById('submitBtn').disabled = false;
+                errorEl.innerText = 'Server connection failed. Is backend running?';
+                errorEl.style.display = 'block';
+            }
+        };
+
+        document.getElementById('submitBtn').onclick = handleSubmit;
+
+        // Add Enter key listener
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleSubmit();
+            }
+        });
+    </script>
+</body>
+
+</html>

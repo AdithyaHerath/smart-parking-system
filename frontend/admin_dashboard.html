@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Smart Parking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            /* Indigo */
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --text-main: #f8fafc;
+            --text-mute: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--glass-border) transparent;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: var(--glass-strong);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .brand i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.5));
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-items {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: var(--text-mute);
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--glass);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            color: var(--text-mute);
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards & Stats */
+        .card {
+            background: var(--glass-strong);
+            backdrop-filter: blur(8px);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--dark-light);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-info h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0 0.25rem 0;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-info p {
+            margin: 0;
+            color: var(--text-mute);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-card.total .stat-icon {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .stat-card.available .stat-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-card.occupied .stat-icon {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Parking Grid */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .slot {
+            aspect-ratio: 1/0.8;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            position: relative;
+            cursor: default;
+        }
+
+        .slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 12px 12px 0 0;
+            opacity: 0.7;
+        }
+
+        .slot.available {
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .slot.available::before {
+            background: var(--success);
+        }
+
+        .slot.available .slot-icon {
+            color: var(--success);
+        }
+
+        .slot.available:hover {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .slot.occupied {
+            border-color: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .slot.occupied::before {
+            background: var(--danger);
+        }
+
+        .slot.occupied .slot-icon {
+            color: var(--danger);
+        }
+
+        .slot.occupied:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .slot-num {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0.5rem 0 0.25rem 0;
+        }
+
+        .slot-icon {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .slot-plate {
+            font-size: 0.8rem;
+            color: var(--text-mute);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 100px;
+            margin-top: 5px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Buttons & Inputs */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-mute);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-mute);
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-mute);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--glass);
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-admin {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+        }
+
+        .badge-user {
+            background: rgba(148, 163, 184, 0.15);
+            color: #cbd5e1;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-square-parking"></i>
+            <h2>SMART PARK</h2>
+        </div>
+
+        <div class="nav-items">
+            <div class="nav-item active" onclick="showTab('dashboard', this)">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="showTab('vehicles_tab', this)">
+                <i class="fa-solid fa-car"></i> Vehicles
+            </div>
+            <div class="nav-item" onclick="showTab('users', this)">
+                <i class="fa-solid fa-users"></i> Users
+            </div>
+            <div class="nav-item" onclick="showTab('settings', this)">
+                <i class="fa-solid fa-gear"></i> Settings
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+    </div>
+
+    <div class="content">
+        <header>
+            <div id="pageTitle">
+                <small style="color:var(--text-mute); display:block; margin-bottom:4px">Welcome Back, Admin</small>
+                <h1>System Overview</h1>
+            </div>
+            <div style="display:flex; gap:1rem; align-items:center">
+                <div class="refresh-btn" onclick="loadAll()" title="Refresh Data">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-info">
+                        <p>Total Capacity</p>
+                        <h3 id="statTotal">--</h3>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-warehouse"></i></div>
+                </div>
+                <div class="stat-card available">
+                    <div class="stat-info">
+                        <p>Available Slots</p>
+                        <h3 id="statAvailable">--</h3>
+                    </div>
+                    <div class="stat-icon"><i class="fa-regular fa-circle-check"></i></div>
+                </div>
+                <div class="stat-card occupied">
+                    <div class="stat-info">
+                        <p>Currently Parked</p>
+                        <h3 id="statOccupied">--</h3>
+                    </div>
+                    <div class="stat-icon"><i class="fa-solid fa-car-side"></i></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> Live
+                        Parking Status</h3>
+                    <div class="legend" style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-mute);">
+                        <span style="display:flex; align-items:center; gap:6px">
+                            <div style="width:8px; height:8px; background:var(--success); border-radius:2px"></div>
+                            Available
+                        </span>
+                        <span style="display:flex; align-items:center; gap:6px">
+                            <div style="width:8px; height:8px; background:var(--danger); border-radius:2px"></div>
+                            Occupied
+                        </span>
+                    </div>
+                </div>
+                <div id="masterGrid" class="plan-grid"></div>
+            </div>
+        </div>
+
+        <!-- Vehicles Tab -->
+        <div id="vehicles_tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--warning)"></i>
+                        Pending Approvals</h3>
+                </div>
+                <div class="table-container">
+                    <table id="pendingTable">
+                        <thead>
+                            <tr>
+                                <th>Plate Number</th>
+                                <th>Owner Name</th>
+                                <th>Status</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-clipboard-check" style="color:var(--success)"></i>
+                        Registered Fleet</h3>
+                </div>
+                <div class="table-container">
+                    <table id="approvedTable">
+                        <thead>
+                            <tr>
+                                <th>Plate Number</th>
+                                <th>Owner Name</th>
+                                <th>Wallet Balance</th>
+                                <th style="text-align:right">Management</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-users-gear" style="color:var(--info)"></i> User
+                        Management</h3>
+                </div>
+                <div class="table-container">
+                    <table id="userTable">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Role</th>
+                                <th>Joined Date</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card" style="max-width: 800px;">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-sliders" style="color:var(--text-main)"></i> System
+                        Configuration</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div class="input-group">
+                        <label>Hourly Parking Fee (Rs.)</label>
+                        <input type="number" id="feePerHour" step="0.5" placeholder="e.g. 50.00">
+                    </div>
+                    <div class="input-group">
+                        <label>Minimum Wallet Balance (Rs.)</label>
+                        <input type="number" id="minBalance" placeholder="e.g. 100.00">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="updateSettings()">
+                    <i class="fa-solid fa-save"></i> Save Configurations
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use FontAwesome for icons (injected via CDN in head)
+
+        // Authentication check
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        // Config
+        const CLOUD_BACKEND_URL = "https://your-backend-url.onrender.com";
+        const isLocal = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '' ||
+            window.location.hostname.startsWith('192.168.');
+
+        const API_BASE = isLocal ? "http://localhost:5001/api/admin" : `${CLOUD_BACKEND_URL}/api/admin`;
+        const API_COMMON = isLocal ? "http://localhost:5001/api" : `${CLOUD_BACKEND_URL}/api`;
+
+        // Tab Switching
+        function showTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            if (el) el.classList.add('active');
+
+            // Update Title
+            const titles = {
+                'dashboard': 'System Overview',
+                'vehicles_tab': 'Vehicle Management',
+                'users': 'User Directory',
+                'settings': 'System Settings'
+            };
+            document.querySelector('#pageTitle h1').innerText = titles[tabId];
+        }
+
+        async function loadAll() {
+            try {
+                // PENDING APPROVALS
+                const pendingRes = await fetch(`${API_BASE}/approvals/pending`);
+                const pendingData = await pendingRes.json();
+                document.querySelector('#pendingTable tbody').innerHTML = pendingData.data.map(v => `
+                    <tr>
+                        <td style="font-family:'Courier New', monospace; font-weight:700">${v.vehicle_number}</td>
+                        <td>${v.owner_name}</td>
+                        <td><span class="badge badge-pending">PENDING</span></td>
+                        <td style="text-align:right">
+                            <button class="btn btn-sm btn-success" onclick="action(${v.vehicle_id}, 'approve')"><i class="fa-solid fa-check"></i> Approve</button>
+                            <button class="btn btn-sm btn-danger" onclick="action(${v.vehicle_id}, 'reject')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        </td>
+                    </tr>
+                `).join('') || `<tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--text-mute)">No pending requests found</td></tr>`;
+
+                // APPROVED VEHICLES
+                const appRes = await fetch(`${API_BASE}/vehicles/approved`);
+                const appData = await appRes.json();
+                document.querySelector('#approvedTable tbody').innerHTML = appData.data.map(v => `
+                    <tr>
+                        <td style="font-family:'Courier New', monospace; font-weight:700">${v.vehicle_number}</td>
+                        <td>${v.owner_name}</td>
+                        <td style="font-weight:600; color:${v.wallet_balance < 100 ? 'var(--danger)' : 'var(--success)'}">Rs. ${v.wallet_balance.toFixed(2)}</td>
+                        <td style="text-align:right">
+                            <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger)" onclick="removeVehicle(${v.vehicle_id}, '${v.vehicle_number}')"><i class="fa-solid fa-trash"></i> Remove</button>
+                        </td>
+                    </tr>
+                `).join('') || `<tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--text-mute)">No active vehicles found</td></tr>`;
+
+                // SETTINGS
+                const setRes = await fetch(`${API_BASE}/settings`);
+                const setData = await setRes.json();
+                document.getElementById('feePerHour').value = setData.data.parking_fee_per_hour;
+                document.getElementById('minBalance').value = setData.data.min_wallet_balance;
+
+                // USERS
+                const userRes = await fetch(`${API_BASE}/users`);
+                const userData = await userRes.json();
+                document.querySelector('#userTable tbody').innerHTML = userData.data.map(u => `
+                    <tr>
+                        <td>${u.username}</td>
+                        <td>${u.full_name}</td>
+                        <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role.toUpperCase()}</span></td>
+                        <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+
+                loadSlots();
+            } catch (err) { console.error("Error loading data:", err); }
+        }
+
+        async function loadSlots() {
+            try {
+                const res = await fetch(`${API_COMMON}/slots`);
+                const data = await res.json();
+                const grid = document.getElementById('masterGrid');
+                grid.innerHTML = '';
+
+                let available = 0;
+                let occupied = 0;
+
+                data.data.forEach(slot => {
+                    if (slot.is_occupied) occupied++; else available++;
+
+                    const el = document.createElement('div');
+                    el.className = `slot ${slot.is_occupied ? 'occupied' : 'available'}`;
+                    el.innerHTML = `
+                        <div class="slot-icon">${slot.is_occupied ? '<i class="fa-solid fa-car-side"></i>' : 'FREE'}</div>
+                        <div class="slot-num">${slot.slot_number}</div>
+                        ${slot.is_occupied ? `<div class="slot-plate">${slot.current_vehicle_number || 'UNKNOWN'}</div>` : ''}
+                    `;
+                    grid.appendChild(el);
+                });
+
+                document.getElementById('statTotal').innerText = data.data.length;
+                document.getElementById('statAvailable').innerText = available;
+                document.getElementById('statOccupied').innerText = occupied;
+            } catch (err) { console.error("Error loading slots:", err); }
+        }
+
+        async function action(id, type) {
+            const reason = type === 'reject' ? prompt('Reason for rejection:') : '';
+            if (type === 'reject' && reason === null) return;
+
+            const res = await fetch(`${API_BASE}/vehicle/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle_id: id, action: type, reason })
+            });
+            const data = await res.json();
+            // Show toast/alert
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = type === 'approve' ? '<i class="fa-solid fa-check"></i> Done' : '<i class="fa-solid fa-check"></i> Done';
+            setTimeout(loadAll, 500);
+        }
+
+        async function removeVehicle(id, vNum) {
+            if (!confirm(`Are you sure you want to completely remove vehicle ${vNum}? This will delete all record of it.`)) return;
+
+            await fetch(`${API_BASE}/vehicle/${id}`, { method: 'DELETE' });
+            loadAll();
+        }
+
+        async function updateSettings() {
+            const fee = document.getElementById('feePerHour').value;
+            const min = document.getElementById('minBalance').value;
+            const btn = event.target;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            await fetch(`${API_BASE}/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parking_fee_per_hour: fee, min_wallet_balance: min })
+            });
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved Successfully';
+                setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-save"></i> Save Configurations', 2000);
+            }, 500);
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        loadAll();
+        // Auto refresh map every 5s
+        setInterval(loadSlots, 5000); 
+    </script>
+</body>
+
+</html>

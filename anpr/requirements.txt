@@ -1,0 +1,6 @@
+opencv-python==4.10.0.84
+pytesseract==0.3.10
+requests==2.32.3
+Pillow==10.4.0
+easyocr
+numpy<2

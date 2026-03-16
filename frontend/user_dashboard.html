@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Smart Parking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            /* Violet */
+            --primary-hover: #7c3aed;
+            --secondary: #3b82f6;
+            /* Blue */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --text-main: #f8fafc;
+            --text-mute: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(30, 41, 59, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--glass-border) transparent;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: var(--glass-strong);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .brand i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-items {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-mute);
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+            color: var(--primary);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .user-profile {
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            margin-bottom: 1rem;
+        }
+
+        .logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards & Stats */
+        .card {
+            background: var(--glass-strong);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+        }
+
+        .card.highlight {
+            border-color: rgba(245, 158, 11, 0.3);
+            background: linear-gradient(145deg, rgba(245, 158, 11, 0.05), rgba(30, 41, 59, 0.8));
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            padding: 1.75rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-card.wallet-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-card.vehicle-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-label {
+            color: var(--text-mute);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .stat-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 2.5rem;
+            opacity: 0.2;
+        }
+
+        /* Parking Grid */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .slot {
+            aspect-ratio: 1/1.1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .slot.available {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .slot.available:hover {
+            background: rgba(16, 185, 129, 0.15);
+            transform: scale(1.05);
+        }
+
+        .slot.available .slot-icon {
+            color: var(--success);
+        }
+
+        .slot.occupied {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .slot.occupied:hover {
+            background: rgba(239, 68, 68, 0.15);
+            transform: scale(1.05);
+        }
+
+        .slot.occupied .slot-icon {
+            color: var(--danger);
+        }
+
+        .slot-num {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .slot-type {
+            font-size: 0.7rem;
+            color: var(--text-mute);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-mute);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Forms & Inputs */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--text-mute);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-approved {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-rejected {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        /* Wallet Section */
+        .wallet-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .wallet-actions {
+            flex: 2;
+        }
+
+        .wallet-visual {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .wallet-visual h1 {
+            background: none;
+            -webkit-text-fill-color: white;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .wallet-container {
+                flex-direction: column-reverse;
+            }
+
+            .wallet-visual {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-square-parking"></i>
+            <h2>SMART PARK</h2>
+        </div>
+
+        <div class="nav-items">
+            <div class="nav-item active" onclick="showTab('overview', this)">
+                <i class="fa-solid fa-grid-2"></i> Dashboard
+            </div>
+            <div class="nav-item" onclick="showTab('vehicles', this)">
+                <i class="fa-solid fa-car"></i> My Vehicles
+            </div>
+            <div class="nav-item" onclick="showTab('wallet', this)">
+                <i class="fa-solid fa-wallet"></i> Wallet
+            </div>
+            <div class="nav-item" onclick="showTab('plan', this)">
+                <i class="fa-solid fa-map"></i> Parking Plan
+            </div>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-info">
+                <p id="userName" style="font-weight:600; margin:0; font-size:1.1rem">User</p>
+                <small style="color:var(--text-mute)">Premium Member</small>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout account
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+        <header>
+            <div>
+                <small style="color:var(--text-mute); display:block; margin-bottom:4px">Overview</small>
+                <h1 id="pageTitle">Welcome Back</h1>
+            </div>
+            <div
+                style="background:var(--glass-strong); padding:0.5rem 1rem; border-radius:10px; border:1px solid var(--glass-border); color:var(--text-mute); font-size:0.9rem">
+                <i class="fa-solid fa-clock"></i> <span id="clock">--:--</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Overview -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-row">
+                <div class="stat-card wallet-card">
+                    <div class="stat-label">Total Wallet Balance</div>
+                    <div class="stat-value">Rs. <span id="totalBalance">0.00</span></div>
+                    <i class="fa-solid fa-wallet stat-icon"></i>
+                </div>
+                <div class="stat-card vehicle-card">
+                    <div class="stat-label">Registered Vehicles</div>
+                    <div class="stat-value" id="vehicleCount">0</div>
+                    <i class="fa-solid fa-car stat-icon"></i>
+                </div>
+            </div>
+
+            <div class="card highlight" id="exitCard" style="display:none;">
+                <h3><i class="fa-solid fa-person-walking-arrow-right" style="color:var(--warning)"></i> Active Session
+                    Detected</h3>
+                <p style="color:var(--text-mute); margin-bottom:1.5rem">One of your vehicles is currently parked. If the
+                    automatic gate didn't open, you can manually trigger an exit.</p>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items: end;">
+                    <div class="input-group" style="margin:0">
+                        <label>Select Parked Vehicle</label>
+                        <select id="exitVehicleSelect" style="background:rgba(0,0,0,0.2)"></select>
+                    </div>
+                    <button class="btn btn-primary" style="background:var(--warning); color:var(--dark-light)"
+                        onclick="manualExit()">
+                        Exit & Pay
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity Log</h3>
+                <div class="table-responsive">
+                    <table id="logTable">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Plate</th>
+                                <th>Slot</th>
+                                <th>Entry Time</th>
+                                <th>Exit Time</th>
+                                <th>Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Vehicles -->
+        <div id="vehicles" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-circle-plus" style="color:var(--success)"></i> Register New Vehicle</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1.5rem; align-items: end;">
+                    <div class="input-group" style="margin:0">
+                        <label>Plate Number</label>
+                        <input type="text" id="vNumber" placeholder="e.g. ND8740"
+                            style="font-family:'Courier New', monospace; font-weight:700">
+                    </div>
+                    <div class="input-group" style="margin:0">
+                        <label>Owner Name</label>
+                        <input type="text" id="vOwner" placeholder="e.g. John Doe">
+                    </div>
+                    <button class="btn btn-primary" onclick="addVehicle()">
+                        <i class="fa-solid fa-plus"></i> Register
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-list-check"></i> Your Fleet</h3>
+                <div class="table-responsive">
+                    <table id="vehicleTable">
+                        <thead>
+                            <tr>
+                                <th>Plate Number</th>
+                                <th>Status</th>
+                                <th>Wallet Balance</th>
+                                <th style="text-align:right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Top-up -->
+        <div id="wallet" class="tab-content">
+            <div class="wallet-container">
+                <div class="card wallet-actions" style="margin:0">
+                    <h3 style="margin-bottom:2rem"><i class="fa-solid fa-money-bill-transfer"></i> Add Funds</h3>
+
+                    <div class="input-group">
+                        <label>Select Vehicle to Top-up</label>
+                        <select id="walletVehicleSelect"></select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Top-up Amount (Rs.)</label>
+                        <div style="position:relative">
+                            <span style="position:absolute; left:1rem; top:0.9rem; color:var(--text-mute)">Rs.</span>
+                            <input type="number" id="topupAmount" placeholder="0.00"
+                                style="padding-left:3rem; font-weight:600">
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem">
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.05)"
+                            onclick="document.getElementById('topupAmount').value=100">+100</button>
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.05)"
+                            onclick="document.getElementById('topupAmount').value=500">+500</button>
+                        <button class="btn btn-sm" style="background:rgba(255,255,255,0.05)"
+                            onclick="document.getElementById('topupAmount').value=1000">+1000</button>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="topup()" style="width: 100%;">
+                        <i class="fa-solid fa-credit-card"></i> Pay & Add Funds
+                    </button>
+                </div>
+
+                <div class="wallet-visual">
+                    <i class="fa-solid fa-wallet" style="font-size:3rem; opacity:0.8; margin-bottom:1rem"></i>
+                    <h3 style="-webkit-text-fill-color:white; justify-content:center">Secure Wallet</h3>
+                    <p style="opacity:0.8; font-size:0.9rem; line-height:1.6">Funds added to your vehicle wallet are
+                        immediately available for automatic parking payments at any of our gates.</p>
+                    <div
+                        style="margin-top:2rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; display:inline-flex; align-items:center; gap:0.5rem">
+                        <i class="fa-solid fa-lock"></i> 100% Encrypted Transactions
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Plan -->
+        <div id="plan" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3><i class="fa-solid fa-map-location-dot"></i> Live Parking Map</h3>
+                    <div style="display: flex; gap: 1rem; font-size: 0.85rem;">
+                        <span style="display:flex; align-items:center; gap:6px">
+                            <div style="width:8px; height:8px; background:var(--success); border-radius:2px"></div>
+                            Available
+                        </span>
+                        <span style="display:flex; align-items:center; gap:6px">
+                            <div style="width:8px; height:8px; background:var(--danger); border-radius:2px"></div>
+                            Occupied
+                        </span>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary); margin-top:1.5rem; margin-bottom:0.5rem">Ground Floor (Zone A)</h4>
+                <div class="plan-grid" id="gridGround"></div>
+
+                <h4 style="color: var(--secondary); margin-top: 2rem; margin-bottom:0.5rem">First Floor (Zone B)</h4>
+                <div class="plan-grid" id="gridFirst"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = 'login.html';
+        document.getElementById('userName').innerText = user.full_name.split(' ')[0]; // First name only for cleaner look
+
+        function showTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            if (el) el.classList.add('active');
+
+            const titles = {
+                'overview': 'Dashboard Overview',
+                'vehicles': 'My Vehicles',
+                'wallet': 'Wallet & Payments',
+                'plan': 'Parking Plan'
+            };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+
+            if (tabId === 'plan') loadSlots();
+        }
+
+        const CLOUD_BACKEND_URL = "https://your-backend-url.onrender.com"; // REPLACE AFTER DEPLOYMENT
+        const isLocal = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === '' ||
+            window.location.hostname.startsWith('192.168.');
+
+        const API_BASE = isLocal
+            ? "http://localhost:5001/api"
+            : `${CLOUD_BACKEND_URL}/api`;
+
+        async function loadData() {
+            try {
+                // Dashboard stats
+                const dashRes = await fetch(`${API_BASE}/user/dashboard/${user.user_id}`);
+                const dashData = await dashRes.json();
+                document.getElementById('totalBalance').innerText = dashData.data.total_balance.toFixed(2);
+                document.getElementById('vehicleCount').innerText = dashData.data.vehicle_count;
+
+                // Recent Logs
+                const lBody = document.querySelector('#logTable tbody');
+                lBody.innerHTML = dashData.data.recent_logs.map(l => `
+                    <tr>
+                        <td style="font-family:'Courier New', monospace; font-weight:700">${l.vehicle_number}</td>
+                        <td><span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px">${l.slot_number}</span></td>
+                        <td>${new Date(l.entry_time).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</td>
+                        <td>${l.exit_time ? new Date(l.exit_time).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' }) : '<span style="color:var(--success); font-weight:600"><i class="fa-solid fa-parking"></i> Parked</span>'}</td>
+                        <td style="font-weight:600">${l.parking_fee > 0 ? 'Rs.' + l.parking_fee : '-'}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center; color:var(--text-mute); padding:2rem">No activity logged yet</td></tr>';
+
+                // Update Exit Dropdown
+                const parkedVehicles = dashData.data.recent_logs.filter(l => !l.exit_time);
+                const exitCard = document.getElementById('exitCard');
+                const exitSelect = document.getElementById('exitVehicleSelect');
+
+                if (parkedVehicles.length > 0) {
+                    exitCard.style.display = 'block';
+                    exitSelect.innerHTML = parkedVehicles.map(v => `<option value="${v.vehicle_number}">${v.vehicle_number} (Slot ${v.slot_number})</option>`).join('');
+                } else {
+                    exitCard.style.display = 'none';
+                }
+
+                // Vehicles & Wallet Dropdown
+                const vRes = await fetch(`${API_BASE}/user/vehicles/${user.user_id}`);
+                const vData = await vRes.json();
+
+                const vBody = document.querySelector('#vehicleTable tbody');
+                vBody.innerHTML = vData.data.map(v => `
+                    <tr>
+                        <td style="font-family:'Courier New', monospace; font-weight:700">${v.vehicle_number}</td>
+                        <td><span class="badge badge-${v.is_approved === 1 ? 'approved' : (v.is_approved === -1 ? 'rejected' : 'pending')}">
+                            ${v.is_approved === 1 ? 'ACTIVE' : (v.is_approved === -1 ? 'REJECTED' : 'PENDING')}
+                        </span></td>
+                        <td style="color:${v.wallet_balance < 100 ? 'var(--danger)' : 'var(--success)'}; font-weight:600">Rs.${v.wallet_balance.toFixed(2)}</td>
+                        <td style="text-align:right">
+                            <button class="btn btn-sm btn-primary" onclick="goToTopup('${v.vehicle_number}')">
+                                <i class="fa-solid fa-bolt"></i> Top-up
+                            </button>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="4" style="text-align:center; color:var(--text-mute); padding:2rem">No vehicles registered</td></tr>';
+
+                const walletSelect = document.getElementById('walletVehicleSelect');
+                const currentWalletSelection = walletSelect.value;
+
+                walletSelect.innerHTML = vData.data.map(v => `<option value="${v.vehicle_number}">${v.vehicle_number} (Bal: Rs.${v.wallet_balance.toFixed(2)})</option>`).join('');
+
+                // Restore selection if it still exists in the new list
+                if (currentWalletSelection) {
+                    const optionExists = Array.from(walletSelect.options).some(opt => opt.value === currentWalletSelection);
+                    if (optionExists) {
+                        walletSelect.value = currentWalletSelection;
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadSlots() {
+            try {
+                const res = await fetch(`${API_BASE}/slots`);
+                const data = await res.json();
+
+                const groundGrid = document.getElementById('gridGround');
+                const firstGrid = document.getElementById('gridFirst');
+                groundGrid.innerHTML = ''; firstGrid.innerHTML = '';
+
+                data.data.forEach(slot => {
+                    const el = document.createElement('div');
+                    el.className = `slot ${slot.is_occupied ? 'occupied' : 'available'}`;
+                    el.innerHTML = `
+                        <div class="slot-icon">${slot.is_occupied ? '<i class="fa-solid fa-car-side"></i>' : '<i class="fa-solid fa-check"></i>'}</div>
+                        <div class="slot-num">${slot.slot_number}</div>
+                    `;
+
+                    if (slot.slot_number.startsWith('A')) groundGrid.appendChild(el);
+                    else firstGrid.appendChild(el);
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function addVehicle() {
+            const vehicle_number = document.getElementById('vNumber').value;
+            const owner_name = document.getElementById('vOwner').value;
+            const btn = event.target;
+
+            if (!vehicle_number || !owner_name) return alert('Fill all fields');
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+            const res = await fetch(`${API_BASE}/user/vehicle/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.user_id, vehicle_number, owner_name })
+            });
+            const data = await res.json();
+            alert(data.message);
+
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Register';
+            document.getElementById('vNumber').value = '';
+            document.getElementById('vOwner').value = '';
+            loadData();
+        }
+
+        async function topup() {
+            const vNum = document.getElementById('walletVehicleSelect').value;
+            const amount = document.getElementById('topupAmount').value;
+            const btn = event.target;
+
+            if (!vNum || !amount || amount <= 0) return alert('Select vehicle and enter valid amount');
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Payment...';
+
+            const res = await fetch(`${API_BASE}/user/wallet/topup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle_number: vNum, amount })
+            });
+            const data = await res.json();
+
+            setTimeout(() => {
+                alert(`New balance for ${vNum}: Rs.${data.new_balance.toFixed(2)}`);
+                btn.innerHTML = '<i class="fa-solid fa-credit-card"></i> Pay & Add Funds';
+                document.getElementById('topupAmount').value = '';
+                loadData();
+            }, 1000);
+        }
+
+        function goToTopup(vehicleNumber) {
+            showTab('wallet', document.querySelectorAll('.nav-item')[2]);
+
+            const walletSelect = document.getElementById('walletVehicleSelect');
+            walletSelect.value = vehicleNumber;
+
+            if (walletSelect.value !== vehicleNumber) {
+                setTimeout(() => {
+                    walletSelect.value = vehicleNumber;
+                }, 500);
+            }
+            document.getElementById('topupAmount').focus();
+        }
+
+        async function manualExit() {
+            const vNum = document.getElementById('exitVehicleSelect').value;
+            if (!vNum) return;
+
+            if (!confirm(`Are you sure you want to trigger manual exit for ${vNum}? The fee will be deducted from your wallet.`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/vehicle/exit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vehicle_number: vNum })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    alert(`Exit recorded! Fee: Rs.${data.data.parking_fee.toFixed(2)}`);
+                    loadData();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) { alert('Server error'); }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        loadData();
+        setInterval(loadData, 5000); // Auto refresh
+    </script>
+</body>
+
+</html>
