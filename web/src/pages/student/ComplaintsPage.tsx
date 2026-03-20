@@ -75,7 +75,7 @@ export default function ComplaintsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl space-y-6 animate-fade-in">
+      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-heading font-bold">Complaints</h2>
           <Button onClick={() => setShowForm(!showForm)}>
