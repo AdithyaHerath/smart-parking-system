@@ -87,7 +87,7 @@ export default function SecurityEPSSPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl space-y-6 animate-fade-in">
+      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         <div className="flex items-center gap-2">
           <ShieldAlert className="h-6 w-6 text-warning" />
           <h2 className="text-2xl font-heading font-bold">Emergency Parking Spot Assign (EPSS)</h2>
