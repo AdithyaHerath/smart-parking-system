@@ -91,7 +91,7 @@ export default function AdminSearchPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl space-y-6 animate-fade-in">
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         <h2 className="text-2xl font-heading font-bold">Search Vehicle</h2>
         <div className="flex gap-2">
           <div className="relative flex-1">
