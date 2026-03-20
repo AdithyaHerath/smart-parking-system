@@ -4,19 +4,33 @@ import { useAuth } from '@/hooks/useAuth';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import PayPalTopUpDialog from '@/components/wallet/PayPalTopUpDialog';
 
 export default function WalletPage() {
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetchData = () => {
     if (!user) return;
     supabase.from('wallets').select('balance_lkr').eq('user_id', user.id).single()
       .then(({ data }) => setBalance(data?.balance_lkr || 0));
     supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20)
       .then(({ data }) => setTransactions(data || []));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [user]);
+
+  const handleTopUpSuccess = (newBalance: number) => {
+    setBalance(newBalance);
+    // Refresh transactions to show the new top-up
+    if (user) {
+      supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20)
+        .then(({ data }) => setTransactions(data || []));
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -31,6 +45,17 @@ export default function WalletPage() {
               <p className="text-4xl font-heading font-bold">LKR {balance}</p>
               <p className="text-xs opacity-60 mt-1">Min: LKR 300 • Max: LKR 2,000</p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Top-up options */}
+        <Card>
+          <CardHeader><CardTitle>Top-up Options</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <PayPalTopUpDialog currentBalance={balance} onSuccess={handleTopUpSuccess} />
+            <p className="text-sm text-muted-foreground text-center">
+              Or visit the <strong>Cashier counter</strong> with your Student ID for a cash top-up.
+            </p>
           </CardContent>
         </Card>
 
@@ -66,14 +91,6 @@ export default function WalletPage() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="py-4">
-            <p className="text-sm text-muted-foreground text-center">
-              To top up your wallet, visit the <strong>Cashier counter</strong> with your Student ID and make a cash payment.
-            </p>
           </CardContent>
         </Card>
       </div>
