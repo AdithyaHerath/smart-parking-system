@@ -38,7 +38,7 @@ export default function AdminStaffPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-lg space-y-6 animate-fade-in">
+      <div className="max-w-lg mx-auto space-y-6 animate-fade-in">
         <h2 className="text-2xl font-heading font-bold">Staff Management</h2>
         <Card>
           <CardHeader><CardTitle>Create Staff Account</CardTitle></CardHeader>
