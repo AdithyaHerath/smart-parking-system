@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.verify-reset-otp]
 verify_jwt = false
+
+[functions.verify-paypal]
+verify_jwt = false

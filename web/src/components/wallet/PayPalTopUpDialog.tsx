@@ -21,7 +21,7 @@ const PAYPAL_CLIENT_ID = 'AfLHnZEPzHrN0dWd4UK7TIhzZNA11UYniOlj31VmJfoEmVf7biUfn9
 
 const PRESET_AMOUNTS = [300, 500, 1000, 1500];
 
-// Approximate LKR to USD conversion rate (adjust as needed)
+// Approximate LKR to USD conversion rate
 const LKR_TO_USD = 0.0033;
 
 interface PayPalTopUpDialogProps {
@@ -61,6 +61,9 @@ export default function PayPalTopUpDialog({ currentBalance, onSuccess }: PayPalT
 
       const response = await supabase.functions.invoke('verify-paypal', {
         body: { orderId: details.id, amountLKR: amountNum },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
       });
 
       if (response.error) {
