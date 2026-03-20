@@ -62,7 +62,7 @@ export default function CashierTopupPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-lg space-y-6 animate-fade-in">
+      <div className="max-w-lg mx-auto space-y-6 animate-fade-in">
         <h2 className="text-2xl font-heading font-bold">Wallet Top-Up</h2>
 
         <Card>
