@@ -1,0 +1,16 @@
+project_id = "ieduoyanviowobfaphmw"
+
+[functions.gemini-chat]
+verify_jwt = false
+
+[functions.send-registration-otp]
+verify_jwt = false
+
+[functions.verify-registration-otp]
+verify_jwt = false
+
+[functions.verify-reset-otp]
+verify_jwt = false
+
+[functions.verify-paypal]
+verify_jwt = false
