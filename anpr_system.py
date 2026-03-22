@@ -162,7 +162,7 @@ def main():
             plate = read_plate(frame.copy())
             
             if plate:
-                print(f"✅ DETECTED: {plate}")
+                print(f" DETECTED: {plate}")
                 confirm = input(f"   Confirm {plate}? (y/n): ").strip().lower()
                 
                 if confirm == 'y':
@@ -174,12 +174,12 @@ def main():
                         
                         if mode == "ENTRY":
                             fee = res_data.get('fee_deducted', '100/50')
-                            print(f"🎉 SUCCESS! Entry Recorded.")
-                            print(f"💰 Fixed Fee of LKR {fee} deducted from wallet.")
+                            print(f" SUCCESS! Entry Recorded.")
+                            print(f" Fixed Fee of LKR {fee} deducted from wallet.")
                             last_result = f"{plate}: ENTRY (Paid LKR {fee})"
                         else:
-                            print(f"🎉 SUCCESS! Exit Recorded.")
-                            print(f"🅿️  Slot is now FREE.")
+                            print(f" SUCCESS! Exit Recorded.")
+                            print(f"  Slot is now FREE.")
                             last_result = f"{plate}: EXIT (Slot Freed)"
                         time.sleep(2)
                     else:
