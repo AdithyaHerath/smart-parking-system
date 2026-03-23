@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_parking/services/auth_service.dart';
 import 'package:smart_parking/screens/main_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -250,8 +251,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Website button
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () {
-                    // TODO: add website link after hosting
+                  onTap: () async {
+                    final Uri websiteUrl = Uri.parse(
+                      "https://www.npark-system.online/",
+                    );
+                    if (await canLaunchUrl(websiteUrl)) {
+                      await launchUrl(
+                        websiteUrl,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 24),
