@@ -37,6 +37,7 @@ dependencies:
   url_launcher: ^6.3.2
   image_picker: ^1.2.1
   shared_preferences: ^2.5.4
+  supabase_flutter: ^2.12.0
   
 
 
