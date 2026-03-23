@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-// ==========================================
+
 // 1. MOCKED BUSINESS LOGIC FUNCTIONS
-// (In a real scenario, these are imported from your utils/helpers folder)
-// ==========================================
 
 const validateEmail = (email: string) => email.endsWith('@students.nsbm.ac.lk');
 const calculateFee = (type: string) => type === 'car' ? 100 : type === 'motorbike' ? 50 : 0;
@@ -16,9 +14,9 @@ const validateOTP = (minutesElapsed: number) => minutesElapsed <= 10;
 const checkAdvanceWindow = (hoursAhead: number) => hoursAhead <= 24;
 
 
-// ==========================================
-// 2. OFFICIAL UNIT TEST SUITE (Matches Report Table 7.2)
-// ==========================================
+
+// 2. OFFICIAL UNIT TEST SUITE (Matches Report Table 9.2)
+
 
 describe('NPark - Core Domain Logic & Constraints Validation', () => {
 
