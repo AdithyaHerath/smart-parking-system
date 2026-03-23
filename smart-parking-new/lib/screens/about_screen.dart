@@ -261,7 +261,15 @@ class AboutScreen extends StatelessWidget {
                           title: "Visit Website",
                           subtitle: "smart-parking.nsbm.ac.lk",
                           onTap: () async {
-                            // TODO: add real website link after hosting
+                            final Uri websiteUrl = Uri.parse(
+                              "https://www.npark-system.online/",
+                            );
+                            if (await canLaunchUrl(websiteUrl)) {
+                              await launchUrl(
+                                websiteUrl,
+                                mode: LaunchMode.externalApplication,
+                              );
+                            }
                           },
                         ),
                         const SizedBox(height: 10),
@@ -334,7 +342,7 @@ class AboutScreen extends StatelessWidget {
 
                         // Footer
                         Text(
-                          "© 2024 NSBM Green University\nAll Rights Reserved",
+                          "©️ 2024 NSBM Green University\nAll Rights Reserved",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey[400],
